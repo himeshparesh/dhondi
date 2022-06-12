@@ -1,36 +1,67 @@
 import React from 'react';
-import {createAppContainer, createSwitchNavigator} from 'react-navigation';
+import {LogBox, Image} from 'react-native';
+import {appColors} from './src/colors/colors';
+import {appImages} from './src/images/images';
+import {createBottomTabNavigator} from 'react-navigation-tabs';
 import {createStackNavigator} from 'react-navigation-stack';
-import Login from './src/AuthStack/Login';
-import Splash from './src/AuthStack/Splash';
-import Home from './src/AppStack/Home';
+import {createAppContainer} from 'react-navigation';
+import Home from './src/screens/Home';
+import Search from './src/screens/search';
 
-const AuthNavigator = createStackNavigator(
+LogBox.ignoreLogs(['new NativeEventEmitter']);
+LogBox.ignoreAllLogs(); //Ignore all log notifications
+
+const AppStack = createBottomTabNavigator(
   {
-    Splash: {
-      screen: Splash,
+    Home: {
+      screen: Home,
+
+      navigationOptions: {
+        tabBarOptions: {
+          showLabel: false,
+        },
+
+        tabBarIcon: ({focused}) => {
+          let navImg = focused ? appImages.home : appImages.home;
+          return <Image source={navImg} style={{height: 24, width: 24}} />;
+        },
+      },
     },
-    Login: {
-      screen: Login,
+    Search: {
+      screen: Search,
+      navigationOptions: {
+        tabBarOptions: {
+          showLabel: false,
+        },
+
+        tabBarIcon: ({focused}) => {
+          let navImg = focused ? appImages.search : appImages.search;
+          return <Image source={navImg} style={{height: 24, width: 24}} />;
+        },
+      },
     },
   },
+
   {
-    initialRouteName: 'Splash',
+    initialRouteName: 'Search',
+    index: '0',
+    barStyle: {backgroundColor: appColors.white},
+    labeled: false,
   },
 );
 
-const AppNavigator = createStackNavigator({
-  Home: {
-    screen: Home,
+const AppNavigator = createStackNavigator(
+  {
+    App: {
+      screen: AppStack,
+    },
   },
-});
+  {
+    headerMode: 'none',
+  },
+);
 
-const SwitchStack = createSwitchNavigator({
-  Auth: AuthNavigator,
-  App: AppNavigator,
-});
-
-const AppContainer = createAppContainer(SwitchStack);
+const AppContainer = createAppContainer(AppNavigator);
 
 export default class App extends React.Component {
   render() {
